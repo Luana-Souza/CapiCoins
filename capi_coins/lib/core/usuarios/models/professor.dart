@@ -31,9 +31,9 @@ class Professor extends Usuario{
     };
   }
 
-  factory Professor.fromMap(Map<String, dynamic> map){
+  factory Professor.fromMap(String id, Map<String, dynamic> map) {
     return Professor(
-      id: map['id'] ?? '',
+      id: id,
       nome: map['usuarioNome'] ?? '',
       sobrenome: map['usuarioSobrenome'] ?? '',
       email: map['usuarioEmail'] ?? '',
@@ -41,6 +41,13 @@ class Professor extends Usuario{
       siape: map['siape'] ?? '',
       criado_em: map['criado_em'] ?? '',
     );
+  }
+
+  //validar codigosiape
+
+  //toString
+  String toString(){
+    return'Professor{nome: $nome,sobrenome: $sobrenome rga: $siape, email: $email}';
   }
 
 }

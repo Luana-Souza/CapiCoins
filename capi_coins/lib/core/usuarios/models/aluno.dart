@@ -33,9 +33,9 @@ class Aluno extends Usuario {
     };
   }
 
-  factory Aluno.fromMap(Map<String, dynamic> map) {
+  factory Aluno.fromMap(String id, Map<String, dynamic> map) {
     return Aluno(
-      id: map['id'] ?? '',
+      id: id,
       nome: map['usuarioNome'] ?? '',
       sobrenome: map['usuarioSobrenome'] ?? '',
       email: map['usuarioEmail'] ?? '',
@@ -44,4 +44,12 @@ class Aluno extends Usuario {
       criado_em: map['criado_em'] ?? '',
     );
   }
+  //validar rga
+
+  //toString
+  @override
+  String toString(){
+    return'Aluno{nome: $nome,sobrenome: $sobrenome rga: $rga, email: $email}';
+  }
+
 }
