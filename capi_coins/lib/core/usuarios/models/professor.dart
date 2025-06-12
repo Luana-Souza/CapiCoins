@@ -1,17 +1,18 @@
+import 'package:capi_coins/core/excecoes/camada_de_erros.dart';
 import 'package:capi_coins/core/usuarios/models/tipo_usuario.dart';
 import 'package:capi_coins/core/usuarios/models/usuario.dart';
 
 class Professor extends Usuario{
-  final String siape;
+  String siape;
+
   Professor({
     required super.nome,
     required super.sobrenome,
     required super.email,
-    required super.senha,
     required super.criado_em,
-    required this.siape,
+    required String siape,
     required id
-  }): super(id: id);
+  }): siape = validarSiape(siape), super(id: id);
 
   @override
   TipoUsuario getTipo() {
@@ -24,7 +25,6 @@ class Professor extends Usuario{
       'usuarioNome': nome,
       'usuarioSobrenome': sobrenome,
       'usuarioEmail': email,
-      'usuarioSenha': senha,
       'siape': siape,
       'tipo': getTipo().name,
       'criado_em': criado_em,
@@ -37,13 +37,19 @@ class Professor extends Usuario{
       nome: map['usuarioNome'] ?? '',
       sobrenome: map['usuarioSobrenome'] ?? '',
       email: map['usuarioEmail'] ?? '',
-      senha: map['usuarioSenha'] ?? '',
       siape: map['siape'] ?? '',
       criado_em: map['criado_em'] ?? '',
     );
   }
 
   //validar codigosiape
+  static String validarSiape(String siape){
+    siape = siape.trim();
+    if(siape.length != 7){
+      throw CamadaDeErros('Siape deve conter 7 caracteres');
+    }
+    return siape;
+  }
 
   //toString
   String toString(){

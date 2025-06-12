@@ -1,19 +1,20 @@
+import 'package:capi_coins/core/excecoes/camada_de_erros.dart';
 import 'package:capi_coins/core/usuarios/models/tipo_usuario.dart';
 import 'package:capi_coins/core/usuarios/models/usuario.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Aluno extends Usuario {
-  final String rga;
+   String rga;
 
-  Aluno({
-    required super.nome,
-    required super.sobrenome,
-    required super.email,
-    required super.senha,
-    required super.criado_em,
-    required this.rga,
-    required id
-  }) : super(id: id);
+   Aluno({
+     required super.nome,
+     required super.sobrenome,
+     required super.email,
+     required super.criado_em,
+     required String rga,
+     required id
+   })  : rga = validarRga(rga), super(id: id);
+
 
   @override
   TipoUsuario getTipo() {
@@ -26,7 +27,6 @@ class Aluno extends Usuario {
       'usuarioNome': nome,
       'usuarioSobrenome': sobrenome,
       'usuarioEmail': email,
-      'usuarioSenha': senha,
       'rga': rga,
       'tipo': getTipo().name,
       'criado_em': criado_em,
@@ -39,12 +39,21 @@ class Aluno extends Usuario {
       nome: map['usuarioNome'] ?? '',
       sobrenome: map['usuarioSobrenome'] ?? '',
       email: map['usuarioEmail'] ?? '',
-      senha: map['usuarioSenha'] ?? '',
       rga: map['rga'] ?? '',
-      criado_em: map['criado_em'] ?? '',
+      criado_em: map['criado_em'] ?? Timestamp.now(),
     );
   }
-  //validar rga
+
+
+  //validar rga, deve conter 12 caracteres
+  static String validarRga(String rga){
+    rga = rga.trim();
+    if(rga.length != 12){
+      throw CamadaDeErros('RGA deve conter 12 caracteres');
+    }
+    return rga;
+  }
+
 
   //toString
   @override

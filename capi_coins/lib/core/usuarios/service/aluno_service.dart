@@ -28,7 +28,6 @@ class AlunoService {
       nome: aluno.nome,
       sobrenome: aluno.sobrenome,
       email: aluno.email,
-      senha: senha,
       rga: aluno.rga,
       criado_em: aluno.criado_em,
     );

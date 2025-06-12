@@ -27,7 +27,6 @@ class ProfessorService {
       nome: professor.nome,
       sobrenome: professor.sobrenome,
       email: professor.email,
-      senha: senha,
       siape: professor.siape,
       criado_em: professor.criado_em,
     );
