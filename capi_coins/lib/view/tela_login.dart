@@ -1,6 +1,4 @@
 import 'package:capi_coins/core/usuarios/models/tipo_usuario.dart';
-import 'package:capi_coins/view/tela_home.dart';
-import 'package:capi_coins/widget/form_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:capi_coins/core/usuarios/service/aluno_service.dart';
 import 'package:capi_coins/core/usuarios/service/professor_service.dart';
@@ -12,11 +10,11 @@ import '../core/usuarios/service/auth_service.dart';
 import '../widget/AuthForm.dart';
 
 
-class Autenticacao extends StatefulWidget {
-  const Autenticacao({super.key});
+class TelaLogin extends StatefulWidget {
+  const TelaLogin({super.key});
 
   @override
-  State<Autenticacao> createState() => _AutenticacaoState();
+  State<TelaLogin> createState() => _TelaLoginState();
 }
 final _formKey = GlobalKey<FormState>();
 bool isLogin = true;
@@ -31,7 +29,7 @@ final _tipoUsuarioController = TextEditingController();
 
 
 
-class _AutenticacaoState extends State<Autenticacao> {
+class _TelaLoginState extends State<TelaLogin> {
   bool entrar = true;
   TipoUsuario _tipoUsuarioRadio = TipoUsuario.aluno;
   String? _tipoUsuario;
@@ -63,18 +61,7 @@ class _AutenticacaoState extends State<Autenticacao> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  //Image.asset("assets/logo.png", height: 128),
-                  const Text(
-                    "CapiCoin",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 32),
-
+                  Image.asset("assets/logo.png"),
                    AuthForm(
                     formKey: _formKey,
                     isLogin: isLogin,
@@ -94,10 +81,16 @@ class _AutenticacaoState extends State<Autenticacao> {
                   SizedBox(height: 16),
 
                   isLoading
-                      ? CircularProgressIndicator()
+                      ? LinearProgressIndicator()
                       : ElevatedButton(
-                    onPressed: () async {
-                      setState(() { isLoading = true; }); // Ativa o indicador
+                      style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      onPressed: isLoading
+                      ? null // desativa o botão enquanto carrega
+                      : () async {
+                      if (_formKey.currentState!.validate()) {
+                      setState(() => isLoading = true); // Ativa o indicador
 
                       if (_formKey.currentState!.validate()) {
                         final email = _emailController.text.trim();
@@ -109,7 +102,6 @@ class _AutenticacaoState extends State<Autenticacao> {
                             final firebaseUser = await authService.signIn(email: email, password: senha);
 
                             if (firebaseUser != null) {
-                              // 🔎 Buscar o tipo de usuário no Firestore antes de chamar alunoService ou professorService
                               final doc = await FirebaseFirestore.instance.collection("usuarios").doc(firebaseUser.uid).get();
                               final tipo = doc.data()?['tipo'];
 
@@ -118,9 +110,9 @@ class _AutenticacaoState extends State<Autenticacao> {
                                 final aluno = await alunoService.entrar(email, senha);
 
                                 if (aluno != null) {
-                                  Navigator.pushReplacement(
+                                  Navigator.pushReplacementNamed(
                                     context,
-                                    MaterialPageRoute(builder: (_) => TelaHome()),
+                                    '/tela-home',
                                   );
                                   return;
                                 }
@@ -129,15 +121,14 @@ class _AutenticacaoState extends State<Autenticacao> {
                                 final professor = await professorService.entrar(email, senha);
 
                                 if (professor != null) {
-                                  Navigator.pushReplacement(
+                                  Navigator.pushReplacementNamed(
                                     context,
-                                    MaterialPageRoute(builder: (_) => TelaHome()),
+                                    '/tela-home',
                                   );
                                   return;
                                 }
                               }
 
-                              // Se cair aqui, significa que o usuário existe no Firebase, mas não está no Firestore corretamente.
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text('Usuário não encontrado no banco de dados.')),
                               );
@@ -149,7 +140,6 @@ class _AutenticacaoState extends State<Autenticacao> {
                           }
                           setState(() { isLoading = false; });
                         } else {
-                          // ✳️ Se não for login, executa o cadastro (como você já fez)
                           final nome = _nomeController.text.trim();
                           final sobrenome = _sobrenomeController.text.trim();
                           final tipoUsuario = _tipoUsuarioController.text.trim();
@@ -188,7 +178,6 @@ class _AutenticacaoState extends State<Autenticacao> {
                               isLogin = true;
                             });
 
-                            // Limpa campos
                             _emailController.clear();
                             _senhaController.clear();
                             _confirmarSenhaController.clear();
@@ -203,8 +192,26 @@ class _AutenticacaoState extends State<Autenticacao> {
                           }
                         }
                       }
-                    },
-                    child: Text(isLogin ? "Entrar" : "Cadastrar"),
+                      setState(() => isLoading = false);
+                      }
+                      },
+                    child: isLoading
+                        ? SizedBox(
+                      height: 14,
+                      width: 14,
+                      child: LinearProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                        : Text(isLogin ? "Entrar" : "Cadastrar"),
+                  ),
+
+                  TextButton(onPressed: () {
+                    setState(() {
+                      isLogin = !isLogin;
+                    });
+                  },
+                    child: Text(isLogin ? "Não tem uma conta? Cadastre-se" : "Já tem uma conta? entre"),
                   ),
                 ],
               )
